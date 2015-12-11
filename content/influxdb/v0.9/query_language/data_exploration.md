@@ -48,7 +48,7 @@ If you'd like to follow along with the queries in this document, see [Sample Dat
 
 This document uses publicly available data from the [National Oceanic and Atmospheric Administration's (NOAA) Center for Operational Oceanographic Products and Services](http://tidesandcurrents.noaa.gov/stations.html?type=Water+Levels). The data include water levels (ft) collected every six seconds at two stations (Santa Monica, CA (ID 9410840) and Coyote Creek, CA (ID 9414575)) over the period from August 18, 2015 through September 18, 2015.
 
-A subsample of the data in the measurement `h2o_feet`: 
+A subsample of the data in the measurement `h2o_feet`:
 ```
 name: h2o_feet
 --------------
@@ -77,8 +77,8 @@ SELECT <stuff> FROM <measurement_name> WHERE <some_conditions>
 
 ### The basic `SELECT` statement
 ---
-The following three examples return everything from the measurement `h2o_feet` (see the CLI response at the end of this section). While they all return the same result, they get to that result in slightly different ways and serve to introduce some of the specifics of the `SELECT` syntax: 
- 
+The following three examples return everything from the measurement `h2o_feet` (see the CLI response at the end of this section). While they all return the same result, they get to that result in slightly different ways and serve to introduce some of the specifics of the `SELECT` syntax:
+
  Select everything from `h2o_feet` with `*`:
  ```sql
  > SELECT * FROM h2o_feet
@@ -95,12 +95,12 @@ The following three examples return everything from the measurement `h2o_feet` (
  Select everything from `h2o_feet` by fully qualifying the measurement:
  ```sql
  > SELECT * FROM NOAA_water_database."default".h2o_feet
- ``` 
+ ```
 * Fully qualify a measurement if you wish to query data from a different database or from a retention policy other than the default [retention policy](/influxdb/v0.9/concepts/glossary/#retention-policy). A fully qualified measurement takes the following form:  
 ```
 "<database>"."<retention policy>"."<measurement>"
  ```
- 
+
 The CLI response for all three queries:
  ```
 name: h2o_feet
@@ -157,7 +157,7 @@ time
 
 ### The `WHERE` clause
 ---
-Use a `WHERE` clause to filter your data based on tags, time ranges, and/or field values. 
+Use a `WHERE` clause to filter your data based on tags, time ranges, and/or field values.
 
 **Tags**  
 Return data where the tag key `location` has the tag value `santa_monica`:  
@@ -166,7 +166,7 @@ Return data where the tag key `location` has the tag value `santa_monica`:
 ```
 * Always single quote tag values in queries - they are strings. Note that double quotes do not work when specifying tag values and can cause queries to silently fail.   
 
-> **Note:** Tags are indexed so queries on tag keys or tag values are highly performant. 
+> **Note:** Tags are indexed so queries on tag keys or tag values are more performant than queries on fields.
 
 Return data where the tag key `location` has no tag value (more on regular expressions [later](/influxdb/v0.9/query_language/data_exploration/#regular-expressions-in-queries)):
 ```sql
@@ -195,11 +195,11 @@ Return data where the tag key `location` has the tag value `santa_monica` and th
 ```
 * Always single quote field values that are strings. Note that double quotes do not work when specifying string field values and can cause queries to silently fail.
 
-> **Note:** Fields are not indexed so queries on field keys or field values are not performant. 
+> **Note:** Fields are not indexed; queries on fields are not as performant as those on tags.
 
 More on the `WHERE` clause in InfluxQL:
 
-* The `WHERE` clause supports comparisons against regular expressions, strings, booleans, floats, integers, and against the `time` of the timestamp. 
+* The `WHERE` clause supports comparisons against strings, booleans, floats, integers, and against the `time` of the timestamp. It supports using regular expressions to match tags, but not to match fields.
 * Chain logic together using `AND`  and `OR`, and separate using `(` and `)`.
 * Acceptable comparators include:  
 `=` equal to  
@@ -212,7 +212,7 @@ More on the `WHERE` clause in InfluxQL:
 
 ## The GROUP BY clause
 
-Use the `GROUP BY` clause to group data by tags and/or time intervals. To successfully implement `GROUP BY`,  append the`GROUP BY` clause to a `SELECT` statement and pair the `SELECT` statement with one of InfluxQL's [functions](/influxdb/v0.9/query_language/functions/). 
+Use the `GROUP BY` clause to group data by tags and/or time intervals. To successfully implement `GROUP BY`,  append the`GROUP BY` clause to a `SELECT` statement and pair the `SELECT` statement with one of InfluxQL's [functions](/influxdb/v0.9/query_language/functions/).
 
 > **Note:** If your query includes both a `WHERE` clause and a `GROUP BY` clause, the `GROUP BY` clause must come after the `WHERE` clause.
 
@@ -269,7 +269,7 @@ time			               count
 2015-09-18T00:00:00Z	 165
 ```
 
-Notice that each timestamp represents a two day interval and that the value in the `count` field is the number of `water_level` points that occurred in that two day interval. You could get the same results by querying the data 17 times - that is, one `COUNT()` query for every two days between August 18, 2015 at midnight and September 18 at 5:00pm - but that could take a while. 
+Notice that each timestamp represents a two day interval and that the value in the `count` field is the number of `water_level` points that occurred in that two day interval. You could get the same results by querying the data 17 times - that is, one `COUNT()` query for every two days between August 18, 2015 at midnight and September 18 at 5:00pm - but that could take a while.
 
 
 Other things to note about `GROUP BY time()`:
@@ -389,7 +389,7 @@ time			              water_level
 
 ### Limit the number of series returned with `SLIMIT`
 ---
-Use `SLIMIT <N>` with `SELECT` and `GROUP BY *` to return every point from N [series](/influxdb/v0.9/concepts/glossary/#series). 
+Use `SLIMIT <N>` with `SELECT` and `GROUP BY *` to return every point from N [series](/influxdb/v0.9/concepts/glossary/#series).
 
 Return everything from one of the series associated with the measurement `h2o_feet`:
 ```sql
@@ -523,7 +523,7 @@ Separate multiple statements in a query with a semicolon. For example:
 
 ## Merge series in queries
 
-In InfluxDB, queries merge series automatically. 
+In InfluxDB, queries merge series automatically.
 
 The `NOAA_water_database` database has two [series](/influxdb/v0.9/concepts/glossary/#series). The first series is made up of the measurement `h2o_feet` and the tag key `location` with the tag value `coyote_creek`. The second series is made of up the measurement `h2o_feet` and the tag key `location` with the tag value `santa_monica`.
 
@@ -558,11 +558,11 @@ time			              mean
 
 ## Time syntax in queries  
 InfluxDB is a time series database so, unsurprisingly, InfluxQL has a lot to do with specifying time ranges. If you do not specify start and end times in your query, they default to epoch 0 (`1970-01-01T00:00:00Z`) and `now()`. The following sections detail how to specify different start and end times in queries.
- 
+
 ### Relative time
 ---
 `now()` is the Unix time of the server at the time the query is executed on that server. Use `now()` to calculate a timestamp relative to the server's
-current timestamp. 
+current timestamp.
 
 Query data starting an hour ago and ending `now()`:
 ```sql
@@ -594,7 +594,7 @@ The following two queries query data between August 18, 2015 23:00:01.232000000 
 
 ```sql
 > SELECT water_level FROM h2o_feet WHERE time > '2015-08-18 23:00:01.232000000' AND time < '2015-09-19'
-``` 
+```
 ```sql
 > SELECT water_level FROM h2o_feet WHERE time > '2015-08-18T23:00:01.232000000Z' AND time < '2015-09-19'
 ```
@@ -614,7 +614,7 @@ Return all points that occur after  `2014-01-01 00:00:00`:
 
 Regular expressions are surrounded by `/` characters and use [Golang's regular expression syntax](http://golang.org/pkg/regexp/syntax/). Use regular expressions when selecting measurements and tags.
 
->**Note:** You cannot use regular expressions to match databases, retention policies, or fields. You can only use regular expressions to match measurements and tags
+>**Note:** You cannot use regular expressions to match databases, retention policies, or fields. You can only use regular expressions to match measurements and tags.
 
 The [sample data](/influxdb/v0.9/query_language/data_exploration/#sample-data) need to be more intricate for the following sections. Assume that the database `NOAA_water_database` now holds several measurements: `h2o_feet`, `h2o_quality`, `h2o_pH`, `average_temperature`, and `h2o_temperature`. Please note that every measurement besides `h2o_feet` is fictional and contains fictional data.
 
@@ -773,5 +773,3 @@ time			               level description	    location	     water_level
 ```
 
 See [the WHERE clause](/influxdb/v0.9/query_language/data_exploration/#the-where-clause) section for an example of how to return data where a tag key has a value and an example of how to return data where a tag key has no value using regular expressions.
-
-
