@@ -17,29 +17,30 @@ This page addresses frequent sources of confusion and places where InfluxDB beha
 * [Querying outside the min/max time range](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#querying-outside-the-min-max-time-range)  
 * [Querying a time range that spans epoch 0](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#querying-a-time-range-that-spans-epoch-0)  
 * [Querying with booleans](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#querying-with-booleans)  
-* [Working with really big or really small integers](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#working-with-really-big-or-really-small-integers) 
+* [Working with really big or really small integers](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#working-with-really-big-or-really-small-integers)
 * [Doing math on timestamps](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#doing-math-on-timestamps)  
 * [Getting an unexpected epoch 0 timestamp in query returns](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#getting-an-unexpected-epoch-0-timestamp-in-query-returns)  
 * [Getting large query returns in batches when using the HTTP API](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#getting-large-query-returns-in-batches-when-using-the-http-api)  
-* [Getting the `expected identifier` error, unexpectedly](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#getting-the-expected-identifier-error-unexpectedly) 
+* [Getting the `expected identifier` error, unexpectedly](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#getting-the-expected-identifier-error-unexpectedly)
 * [Identifying write precision from returned timestamps](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#identifying-write-precision-from-returned-timestamps)  
 * [Single quoting and double quoting in queries](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#single-quoting-and-double-quoting-in-queries)  
-* [Writing more than one continuous query to a single series](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#writing-more-than-one-continuous-query-to-a-single-series)
 
 **Writing data**  
 
 * [Writing integers](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#writing-integers)  
 * [Writing data with negative timestamps](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#writing-data-with-negative-timestamps)  
 * [Writing duplicate points](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#writing-duplicate-points)  
-* [Getting an unexpected error when sending data over the HTTP API](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#getting-an-unexpected-error-when-sending-data-over-the-http-api) 
+* [Getting an unexpected error when sending data over the HTTP API](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#getting-an-unexpected-error-when-sending-data-over-the-http-api)
+* [Writing more than one continuous query to a single series](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#writing-more-than-one-continuous-query-to-a-single-series)  
 * [Words and characters to avoid](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#words-and-characters-to-avoid)  
 * [Single quoting and double quoting when writing data](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#single-quoting-and-double-quoting-when-writing-data)  
 
 **Administration**  
 
-* [Single quoting the password string](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#single-quoting-the-password-string) 
+* [Single quoting the password string](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#single-quoting-the-password-string)
 * [Escaping the single quote in a password](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#escaping-the-single-quote-in-a-password)  
-* [Identifying your version of InfluxDB](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#identifying-your-version-of-influxdb)
+* [Identifying your version of InfluxDB](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#identifying-your-version-of-influxdb)  
+* [Experiencing unexpected data retention after altering a retention policy](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#experiencing-unexpected-data-retention-after-altering-a-retention-policy)
 
 
 # Querying data
@@ -51,7 +52,7 @@ A query that includes a `GROUP BY time()` clause can yield unexpected results:
 
 Those returns typically proceed from the combination of the following two features of InfluxDB:
 
-* By default, InfluxDB uses epoch 0 (`1970-01-01T00:00:00Z`) as the lower bound and `now()` as the upper bound in queries. 
+* By default, InfluxDB uses epoch 0 (`1970-01-01T00:00:00Z`) as the lower bound and `now()` as the upper bound in queries.
 * A query that includes `GROUP BY time()` must cover fewer than 100,000 instances of the supplied time interval
 
 If your `WHERE` time clause is simply `WHERE time < now()` InfluxDB queries the data back to epoch 0 - that behavior often causes the query to breach the 100,000 instances rule and InfluxDB returns a confusing error or result. Avoid perplexing `GROUP BY time()` returns by specifying a valid time interval in the `WHERE` clause.
@@ -60,14 +61,14 @@ If your `WHERE` time clause is simply `WHERE time < now()` InfluxDB queries the 
 </dt>
 
 ## Querying after `now()`
-By default, InfluxDB uses `now()` (the current nanosecond timestamp of the node that is processing the query) as the upper bound in queries. You must provide explicit directions in the `WHERE` clause to query points that occur after `now()`. 
+By default, InfluxDB uses `now()` (the current nanosecond timestamp of the node that is processing the query) as the upper bound in queries. You must provide explicit directions in the `WHERE` clause to query points that occur after `now()`.
 
 The first query below asks InfluxDB to return everything from `hillvalley` that occurs between epoch 0 (`1970-01-01T00:00:00Z`) and `now()`. The second query asks InfluxDB to return everything from `hillvalley` that occurs between epoch 0 and 1,000 days from `now()`.
 
 `SELECT * FROM hillvalley`  
 `SELECT * FROM hillvalley WHERE time < now() + 1000d`
 
-## Querying outside the min/max time range 
+## Querying outside the min/max time range
 Queries with a time range that exceeds the minimum or maximum timestamps valid for InfluxDB currently return no results, rather than an error message.
 
 Smallest valid timestamp: `-9023372036854775808` (approximately `1684-01-22T14:50:02Z`)  
@@ -91,12 +92,12 @@ Acceptable boolean syntax differs for data writes and data queries.
 |  `True`,`False` |  ✔️ |  ✔️ |
 |  `TRUE`,`FALSE` |  ✔️ |  ✔️ |
 
-For example, `SELECT * FROM hamlet WHERE bool=True` returns all points with `bool` set to `TRUE`, but `SELECT * FROM hamlet WHERE bool=T` returns all points with`bool` set to `false`. 
+For example, `SELECT * FROM hamlet WHERE bool=True` returns all points with `bool` set to `TRUE`, but `SELECT * FROM hamlet WHERE bool=T` returns all points with`bool` set to `false`.
 
 <dt> [GitHub Issue #3939](https://github.com/influxdb/influxdb/issues/3939) </dt>
 
 ## Working with really big or really small integers
-InfluxDB stores all integers as signed int64 data types. The minimum and maximum valid values for int64 are `-9023372036854775808` and `9023372036854775807`. See [Go builtins](http://golang.org/pkg/builtin/#int64) for more information. 
+InfluxDB stores all integers as signed int64 data types. The minimum and maximum valid values for int64 are `-9023372036854775808` and `9023372036854775807`. See [Go builtins](http://golang.org/pkg/builtin/#int64) for more information.
 
 Values close to but within those limits may lead to unexpected results; some functions and operators convert the int64 data type to float64 during calculation which can cause overflow issues.
 
@@ -106,7 +107,7 @@ Values close to but within those limits may lead to unexpected results; some fun
 Currently, it is not possible to execute mathematical operators or functions against timestamp values in InfluxDB. All time calculations must be carried out by the client receiving the query results.
 
 ## Getting an unexpected epoch 0 timestamp in query returns
-In InfluxDB, epoch 0  (`1970-01-01T00:00:00Z`)  is often used as a null timestamp equivalent. If you request a query that has no timestamp to return, such as an aggregation function with an unbounded time range, InfluxDB returns epoch 0 as the timestamp. 
+In InfluxDB, epoch 0  (`1970-01-01T00:00:00Z`)  is often used as a null timestamp equivalent. If you request a query that has no timestamp to return, such as an aggregation function with an unbounded time range, InfluxDB returns epoch 0 as the timestamp.
 
 <dt> [GitHub Issue #3337](https://github.com/influxdb/influxdb/issues/3337) </dt>
 
@@ -138,7 +139,7 @@ In the last three queries, and in most unexpected `expected identifier` errors, 
 While using double quotes is an acceptable workaround, we recommend that you avoid using InfluxQL keywords as identifiers for simplicity's sake. The InfluxQL documentation has a comprehensive list of all [InfluxQL keywords](https://github.com/influxdb/influxdb/blob/master/influxql/INFLUXQL.md#keywords).
 
 ## Identifying write precision from returned timestamps
-InfluxDB stores all timestamps as nanosecond values regardless of the write precision supplied. It is important to note that when returning query results, the database silently drops trailing zeros from timestamps which obscures the initial write precision. 
+InfluxDB stores all timestamps as nanosecond values regardless of the write precision supplied. It is important to note that when returning query results, the database silently drops trailing zeros from timestamps which obscures the initial write precision.
 
 In the example below, the tags `precision_supplied` and `timestamp_supplied` show the time precision and timestamp that the user provided at the write. Because InfluxDB silently drops trailing zeros on returned timestamps, the write precision is not recognizable in the returned timestamps.  
 <br>
@@ -155,7 +156,7 @@ time                  value	 precision_supplied  timestamp_supplied
 <dt> [GitHub Issue #2977](https://github.com/influxdb/influxdb/issues/2977) </dt>
 
 ## Single quoting and double quoting in queries
-Single quote string values (for example, tag values) but do not single quote identifiers (database names, retention policy names, user names, measurement names, tag keys, and field keys). 
+Single quote string values (for example, tag values) but do not single quote identifiers (database names, retention policy names, user names, measurement names, tag keys, and field keys).
 
 Double quote identifiers if they start with a digit, contain characters other than `[A-z,0-9,_]`, or if they are an [InfluxQL keyword](https://github.com/influxdb/influxdb/blob/master/influxql/INFLUXQL.md#keywords). You can double quote identifiers even if they don't fall into one of those categories but it isn't necessary.
 
@@ -171,21 +172,12 @@ No: `SELECT * from cr@zy where p^e='2'`
 
 See the [Query Syntax](/influxdb/v0.9/query_language/query_syntax/) page for more information.
 
-## Writing more than one continuous query to a single series
-Use a single continuous query to write several statistics to the same measurement and tag set. For example, tell InfluxDB to write to the `aggregated_stats` measurement the `MEAN` and `MIN` of the `value` field grouped by five-minute intervals and grouped by the `cpu` tag with:
-
-`CREATE CONTINUOUS QUERY mean_min_value ON telegraf BEGIN SELECT MEAN(value) AS mean, MIN(value) AS min INTO aggregated_stats FROM cpu_idle GROUP BY time(5m),cpu END` 
-
-If you create two separate continuous queries (one for calculating the `MEAN` and one for calculating the `MIN`), the `aggregated_stats` measurement will appear to be missing data. Separate continuous queries run at slightly different times and InfluxDB defines a unique point by its measurement, tag set, and timestamp (notice that field is missing from that list). So if two continuous queries write to different fields but also write to the same measurement and tag set, only one of the two fields will ever have data; the last continuous query to run will overwrite the results that were written by the first continuous query with the same timestamp.
-
-For more on continuous queries, see the [continuous queries page](/influxdb/v0.9/query_language/continuous_queries/).
-
 # Writing data
 ## Writing integers
-Add a trailing `i` to the end of the field value when writing an integer. If you do not provide the `i`, InfluxDB will treat the field value as a float. 
+Add a trailing `i` to the end of the field value when writing an integer. If you do not provide the `i`, InfluxDB will treat the field value as a float.
 
 Writes an integer: `value=100i`  
-Writes a float: `value=100` 
+Writes a float: `value=100`
 
 > **Note:** This syntax for writing integers is for versions 0.9.3+. Versions prior to 0.9.3 had a different syntax, see [PR #3526](https://github.com/influxdb/influxdb/pull/3526).
 
@@ -195,16 +187,16 @@ There was a bug in the line protocol parser in versions 0.9.0 to 0.9.4 which tre
 ## Writing duplicate points
 In InfluxDB 0.9 a point is uniquely identified by the measurement name, full [tag set]()(/influxdb/v0.9/concepts/glossary/#tag-set), and the nanosecond timestamp. If a point is submitted with an identical measurement, tag set, and timestamp it will silently overwrite the previous point. This is the intended behavior.
 
-For example, 
+For example,
 <br>`cpu_load,hostname=server02,az=us_west value=24.5 1234567890000000` and
 <br>`cpu_load,hostname=server02,az=us_west value=5.24 1234567890000000` are identical points. The last one written will overwrite the other.
 
 In order to store both points, simply introduce an arbitrary new tag to enforce uniqueness. <br>`cpu_load,hostname=server02,az=us_west,uniq=1 value=24.5 1234567890000000` and
-<br>`cpu_load,hostname=server02,az=us_west,uniq=2 value=5.24 1234567890000000` are now unique points, and each will persist in the database. 
+<br>`cpu_load,hostname=server02,az=us_west,uniq=2 value=5.24 1234567890000000` are now unique points, and each will persist in the database.
 
 You can also increment the timestamp by a nanosecond:
 <br>`cpu_load,hostname=server02,az=us_west,uniq=1 value=24.5 1234567890000000` and
-<br>`cpu_load,hostname=server02,az=us_west,uniq=2 value=5.24 1234567890000001` are now unique points, and each will persist in the database. 
+<br>`cpu_load,hostname=server02,az=us_west,uniq=2 value=5.24 1234567890000001` are now unique points, and each will persist in the database.
 
 
 > **Note:**  The field set has nothing to do with the uniqueness of a point. These are still identical points and the last one written would be the only one to persist:<br>`cpu_load,hostname=server02,az=us_west value=24.5 1234567890000000` and
@@ -214,10 +206,21 @@ You can also increment the timestamp by a nanosecond:
 ## Getting an unexpected error when sending data over the HTTP API
 First, double check your [line protocol](/influxdb/v0.9/write_protocols/line/) syntax. Second, if you continue to receive errors along the lines of `bad timestamp` or `unable to parse`, verify that your newline character is line feed (`\n`, which is ASCII `0x0A`). InfluxDB's line protocol relies on `\n` to indicate the end of a line and the beginning of a new line; files or data that use a newline character other than `\n` will encounter parsing issues. Convert the newline character and try sending the data again.
 
-> **Note:** If you generated your data file on a Windows machine, Windows uses carriage return and line feed (`\r\n`) as the newline character. 
+> **Note:** If you generated your data file on a Windows machine, Windows uses carriage return and line feed (`\r\n`) as the newline character.
+
+## Writing more than one continuous query to a single series
+Use a single continuous query to write several statistics to the same measurement and tag set. For example, tell InfluxDB to write to the `aggregated_stats` measurement the `MEAN` and `MIN` of the `value` field grouped by five-minute intervals and grouped by the `cpu` tag with:
+
+```sql
+CREATE CONTINUOUS QUERY mean_min_value ON telegraf BEGIN SELECT MEAN(value) AS mean, MIN(value) AS min INTO aggregated_stats FROM cpu_idle GROUP BY time(5m),cpu END
+```
+
+If you create two separate continuous queries (one for calculating the `MEAN` and one for calculating the `MIN`), the `aggregated_stats` measurement will appear to be missing data. Separate continuous queries run at slightly different times and InfluxDB defines a unique point by its measurement, tag set, and timestamp (notice that field is missing from that list). So if two continuous queries write to different fields but also write to the same measurement and tag set, only one of the two fields will ever have data; the last continuous query to run will overwrite the results that were written by the first continuous query with the same timestamp.
+
+For more on continuous queries, see [Continuous Queries](/influxdb/v0.9/query_language/continuous_queries/).
 
 ## Words and characters to avoid
-If you use any of the [InfluxQL keywords](https://github.com/influxdb/influxdb/blob/master/influxql/INFLUXQL.md#keywords) as an identifier you will need to double quote that identifier in every query. This can lead to [non-intuitive errors](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#getting-the-expected-identifier-error-unexpectedly). Identifiers are database names, retention policy names, user names, measurement names, tag keys, and field keys. 
+If you use any of the [InfluxQL keywords](https://github.com/influxdb/influxdb/blob/master/influxql/INFLUXQL.md#keywords) as an identifier you will need to double quote that identifier in every query. This can lead to [non-intuitive errors](/influxdb/v0.9/troubleshooting/frequently_encountered_issues/#getting-the-expected-identifier-error-unexpectedly). Identifiers are database names, retention policy names, user names, measurement names, tag keys, and field keys.
 
 To keep regular expressions and quoting simple, avoid using the following characters in identifiers:  
 
@@ -229,7 +232,7 @@ To keep regular expressions and quoting simple, avoid using the following charac
  `,` comma
 
 ## Single quoting and double quoting when writing data
-* Avoid single quoting and double quoting identifiers when writing data via the line protocol; see the examples below for how writing identifiers with quotes can complicate queries. Identifiers are database names, retention policy names, user names, measurement names, tag keys, and field keys. 
+* Avoid single quoting and double quoting identifiers when writing data via the line protocol; see the examples below for how writing identifiers with quotes can complicate queries. Identifiers are database names, retention policy names, user names, measurement names, tag keys, and field keys.
 <br>
 <br>
 	Write with a double-quoted measurement: `INSERT "bikes" bikes_available=3`  
@@ -251,16 +254,16 @@ To keep regular expressions and quoting simple, avoid using the following charac
 	Applicable query: `SELECT * FROM bikes WHERE happiness='level 2'`
 <br>
 <br>
-* Special characters should be escaped with a backslash and not placed in quotes. 
+* Special characters should be escaped with a backslash and not placed in quotes.
 <br>
 <br>
 	Write: `INSERT wacky va\"ue=4`  
 	Applicable query: `SELECT "va\"ue" FROM wacky`
-	
+
 See the [Line Protocol Syntax](https://influxdb.com/docs/v0.9/write_protocols/write_syntax/) page for more information.
 
 # Administration
-## Single quoting the password string 
+## Single quoting the password string
 The `CREATE USER <user> WITH PASSWORD '<password>'` query requires single quotation marks around the password string. Do not include the single quotes when authenticating requests.
 
 ## Escaping the single quote in a password
@@ -285,11 +288,21 @@ There a number of ways to identify the version of InfluxDB that you're using:
 
 `[http] 2015/09/04 12:29:07 ::1 - - [04/Sep/2015:12:29:06 -0700] GET /query?db=&q=create+database+there_you_go HTTP/1.1 200 40 -` ✨`InfluxDBShell/0.9.3`✨ `357970a0-533b-11e5-8001-000000000000 6.07408ms`
 
+## Experiencing unexpected data retention after altering a retention policy
+After [shortening](/influxdb/v0.9/query_language/database_management/#modify-retention-policies-with-alter-retention-policy) the `DURATION` of a retention policy (RP), you may notice that InfluxDB keeps some data that are older than the `DURATION` of the modified RP.
 
+InfluxDB stores data in shard groups. A single shard group covers a specific time interval; InfluxDB determines that time interval by looking at the `DURATION` of the relevant RP. The table below outlines the relationship between the `DURATION` of an RP and the time interval of a shard group:
 
+| RP duration  | Shard group interval  |
+|---|---|
+| < 2 days  | 1 hour  |
+| >= 2 days and <= 6 months  | 1 day  |
+| > 6 months  | 7 days  |
 
+*Example:*
 
+Shard groups cover a seven day time interval if you're working with an infinite RP. If you change the `DURATION` of that RP to one hour, shard groups now cover a one hour time interval. When InfluxDB enforces the new, shorter RP, it drops all of the seven-day length shard groups that are older than one hour. If, however, at the time of the RP change, InfluxDB is still writing to a seven day long shard it cannot drop that shard. It must wait until it has finished writing to that shard to drop it.
 
+In the image below, the RP change occurs on day five of the second seven-day shard group. After the RP change, InfluxDB drops the first seven-day shard, but because it's still writing to the second seven-day shard, it must keep that shard for another 48 hours - this is why older data may stick around even if you've recently shortened the `DURATION` of an RP.
 
-
-
+![Bad sketch](/img/influxdb/sketch.png)
